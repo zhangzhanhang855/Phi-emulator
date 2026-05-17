@@ -1,388 +1,64 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta name="application-name" content="Ph1gr0s Emulator" />
-    <meta name="description" content="An emulator for rhythm game 'Ph1gr0s'" />
-    <meta name="author" content="MisaLiu 2022，Origin by lchzh3473" />
-    <meta name="keywords" content="ph1gr0s,emulator,online" />
-
-    <link rel="stylesheet" href="./css/font-mina.css" />
-    <link rel="stylesheet" href="./css/mdui.min.css?v=1.0.1" />
-
-    <!-- 第三方库脚本 -->
-    <script src="//cdn.jsdelivr.net/npm/vconsole@3.3.4/dist/vconsole.min.js"></script>
-    <script src="./js/jszip.min.js?v=3.7.1"></script>
-    <script src="./js/stackblur.min.js?v=2.5.0"></script>
-    <script src="./js/stats.min.js?v=r17"></script>
-    <script src="./js/Browser.js"></script>
-    <script src="./js/color-thief.js?v=2.3.2"></script>
-
-    <!-- PIXI 引擎 -->
-    <script src="./js/pixi/pixi.min.js?v=6.2.1"></script>
-    <script src="./js/pixi/graphics-extras.min.js?v=6.2.1"></script>
-    <script src="./js/pixi/canvas-renderer.min.js?v=6.2.1"></script>
-    <script src="./js/pixi/canvas-display.min.js?v=6.2.1"></script>
-    <script src="./js/pixi/canvas-graphics.min.js?v=6.2.1"></script>
-    <script src="./js/pixi/canvas-text.min.js?v=6.2.1"></script>
-    <script src="./js/pixi/canvas-sprite.min.js?v=6.2.1"></script>
-    <script src="./js/pixi/pixi-sound.js?v=4.2.0"></script>
-    <script src="./js/mdui.min.js?v=1.0.1"></script>
-
-    <script>
-        var global = {};
-        var vConsole;
-        const BrowserInfo = new Browser();
-        const DeviceInfo = {
-            system: BrowserInfo.os,
-            systemVersion: BrowserInfo.osVersion,
-            systemType: BrowserInfo.device,
-            systemLanguage: BrowserInfo.language,
-            browser: BrowserInfo.browser,
-            browserVersion: BrowserInfo.version,
-            browserEngine: BrowserInfo.engine,
-            supportWebGL: PIXI.utils.isWebGLSupported()
-        };
-
-        var settings = {
-            windowRatio: 16 / 9,
-            antiAlias: true,
-            resolution: window.devicePixelRatio,
-            background: true,
-            backgroundDim: 0.75,
-            backgroundBlur: true,
-            clickAnimate: true,
-            accIndicator: false,
-            showFinger: true,
-            noteScale: 8e3,
-            accIndicatorScale: 500,
-            multiNotesHighlight: true,
-            showApStatus: true,
-            spectrumSettings: { enabled: false, heightPercent: 0.5, alphaPercent: 0.8 },
-            forceCanvas: !DeviceInfo.supportWebGL,
-            showPerformanceIndicator: (getSearchQuery('debug') == 'true'),
-            showJudgementRealTime: (getSearchQuery('debug') == 'true'),
-            hitsound: true,
-            musicVolume: 1,
-            hitsoundVolume: 0.75,
-            challengeMode: false,
-            autoPlay: false,
-            chartDelay: 0,
-            developMode: (getSearchQuery('debug') == 'true'),
-            disableJudgeLineAlpha: false
-        };
-
-        if (getSearchQuery('debug') == 'true') vConsole = new VConsole();
-
-        function getSearchQuery(name) {
-            let queryArray = location.search.substr(1).split('&');
-            let queryObject = {};
-            for (let query of queryArray) {
-                let querySplit = query.split('=');
-                queryObject[querySplit[0]] = querySplit[1];
-            }
-            return queryObject[name];
-        }
-    </script>
-
-    <script src="./js/console.js?v=0.1.0"></script>
-    <script src="./js/class.js?v=0.1.2"></script>
-    <script src="./js/convert.js?v=0.1.1"></script>
-    <script src="./js/function.js?v=0.1.12"></script>
-
-    <style>
-        :root {
-            --mdui-color-primary: #455a64;
-            --mdui-color-accent: #2196f3;
-        }
-
-        * {
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            font-family: 'Mina', "Roboto", "Noto Sans SC", sans-serif;
-            background-color: #f5f5f5;
-            transition: background-color 0.3s ease;
-        }
-
-        /* 侧边栏优化 */
-        .mdui-drawer {
-            background-color: rgba(255, 255, 255, 0.9) !important;
-            backdrop-filter: blur(10px);
-        }
-
-        /* 卡片圆角优化 */
-        .mdui-card, .mdui-panel-item {
-            border-radius: 12px !important;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
-            margin-bottom: 16px !important;
-        }
-
-        /* 停止维护提示框微调 */
-        .card-warning {
-            background: linear-gradient(45deg, #ffc107, #ff9800) !important;
-            color: #fff !important;
-        }
-        .card-warning a { color: #fff; text-decoration: underline; font-weight: bold; }
-
-        /* 面板标题美化 */
-        .mdui-panel-item-header {
-            font-weight: 600;
-            font-size: 1.1em;
-        }
-
-        /* 模拟器显示区域 */
-        #game-canvas-box {
-            border-radius: 8px;
-            background: #000;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        /* 列表项微调 */
-        .mdui-list-item-content {
-            padding-top: 12px !important;
-            padding-bottom: 12px !important;
-        }
-
-        .mdui-list-item-title { font-weight: 500; }
-
-        /* 底部按钮悬浮优化 */
-        .mdui-fab-fixed { bottom: 24px; right: 24px; }
-        
-        .mdui-panel-item-actions {
-            border-top: 1px solid rgba(0,0,0,0.05);
-            padding: 8px 0;
-        }
-    </style>
-    
-    <title>Ph1gr0s Emulator</title>
+<!-- viewport-fit=cover:Fill the whole screen on iPhone X -->
+<meta charset="utf-8" name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Phigros模拟器 - lchzh3473制作</title>
+<link rel="shortcut icon" href="./icon.svg">
+<link rel="manifest" href="./manifest.json">
+<link rel="stylesheet" href="/utils/style.css">
+<link rel="stylesheet" href="style.css">
+<script src="https://pagead2.googlesyndication.com/pagead/managed/js/adsense/m202605120101/show_ads_impl_fy2021.js">
+<script type="text/javascript" charset="UTF-8" async src="https://sdk.51.la/js-sdk-pro.min.js" id="LA_COLLECT">
+<script src="https://hm.baidu.com/hm.js?a2847526e110755a92e0ed1c8e948a32">
+<script>
+" if ('serviceWorker' in navigator) { navigator.serviceWorker.register('/service-worker.js').then(() => { console.log('Service Worker Registered'); }); } "
+</script>
+<script>
+" eval('try{eval("\'use strict\';{async(a=1)=>1}")}catch(e){location.href="/412.html"}'); "
+</script>
+<script src="/utils/main.js">
+<script>
+" (function() { var src = '//fastly.jsdelivr.net/npm/eruda'; if (!new URLSearchParams(location.search).has('test')) return; document.write('<scr' + 'ipt src="' + src + '"></scr' + 'ipt>'); document.write('<scr' + 'ipt>eruda.init();</scr' + 'ipt>'); })(); "
+</script>
+<script>
+" var _hmt = _hmt || []; (function() { var hm = document.createElement("script"); hm.src = "https://hm.baidu.com/hm.js?a2847526e110755a92e0ed1c8e948a32"; var s = document.getElementsByTagName("script")[0]; s.parentNode.insertBefore(hm, s); })(); "
+</script>
+<script>
+" window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-K98WR056RJ'); window.addEventListener('load', function(){ var s = document.createElement('script'); s.src = 'https://www.googletagmanager.com/gtag/js?id=G-K98WR056RJ'; document.body.appendChild(s); }); "
+</script>
+<script>
+"!function(p){"use strict";!function(t){var s=window,e=document,i=p,c="".concat("https:"===e.location.protocol?"https://":"http://","sdk.51.la/js-sdk-pro.min.js"),n=e.createElement("script"),r=e.getElementsByTagName("script")[0];n.type="text/javascript",n.setAttribute("charset","UTF-8"),n.async=!0,n.src=c,n.id="LA_COLLECT",i.d=n;var o=function(){s.LA.ids.push(i)};s.LA?s.LA.ids&&o():(s.LA=p,s.LA.ids=[],o()),r.parentNode.insertBefore(n,r)}()}({id:"Jj67QM9XKxdyBUKP",ck:"Jj67QM9XKxdyBUKP"});"
+</script>
+<script src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8369333813205733" crossorigin="anonymous" data-checked-head="true">
+<script type="module" src="script-1.5.9.2.js">
+<meta http-equiv="origin-trial" content="AlK2UR5SkAlj8jjdEc9p3F3xuFYlF6LYjAML3EOqw1g26eCwWPjdmecULvBH5MVPoqKYrOfPhYVL71xAXI1IBQoAAAB8eyJvcmlnaW4iOiJodHRwczovL2RvdWJsZWNsaWNrLm5ldDo0NDMiLCJmZWF0dXJlIjoiV2ViVmlld1hSZXF1ZXN0ZWRXaXRoRGVwcmVjYXRpb24iLCJleHBpcnkiOjE3NTgwNjcxOTksImlzU3ViZG9tYWluIjp0cnVlfQ==">
+<meta http-equiv="origin-trial" content="Amm8/NmvvQfhwCib6I7ZsmUxiSCfOxWxHayJwyU1r3gRIItzr7bNQid6O8ZYaE1GSQTa69WwhPC9flq/oYkRBwsAAACCeyJvcmlnaW4iOiJodHRwczovL2dvb2dsZXN5bmRpY2F0aW9uLmNvbTo0NDMiLCJmZWF0dXJlIjoiV2ViVmlld1hSZXF1ZXN0ZWRXaXRoRGVwcmVjYXRpb24iLCJleHBpcnkiOjE3NTgwNjcxOTksImlzU3ViZG9tYWluIjp0cnVlfQ==">
+<meta http-equiv="origin-trial" content="A9nrunKdU5m96PSN1XsSGr3qOP0lvPFUB2AiAylCDlN5DTl17uDFkpQuHj1AFtgWLxpLaiBZuhrtb2WOu7ofHwEAAACKeyJvcmlnaW4iOiJodHRwczovL2RvdWJsZWNsaWNrLm5ldDo0NDMiLCJmZWF0dXJlIjoiQUlQcm9tcHRBUElNdWx0aW1vZGFsSW5wdXQiLCJleHBpcnkiOjE3NzQzMTA0MDAsImlzU3ViZG9tYWluIjp0cnVlLCJpc1RoaXJkUGFydHkiOnRydWV9">
+<meta http-equiv="origin-trial" content="A93bovR+QVXNx2/38qDbmeYYf1wdte9EO37K9eMq3r+541qo0byhYU899BhPB7Cv9QqD7wIbR1B6OAc9kEfYCA4AAACQeyJvcmlnaW4iOiJodHRwczovL2dvb2dsZXN5bmRpY2F0aW9uLmNvbTo0NDMiLCJmZWF0dXJlIjoiQUlQcm9tcHRBUElNdWx0aW1vZGFsSW5wdXQiLCJleHBpcnkiOjE3NzQzMTA0MDAsImlzU3ViZG9tYWluIjp0cnVlLCJpc1RoaXJkUGFydHkiOnRydWV9">
+<meta http-equiv="origin-trial" content="A1S5fojrAunSDrFbD8OfGmFHdRFZymSM/1ss3G+NEttCLfHkXvlcF6LGLH8Mo5PakLO1sCASXU1/gQf6XGuTBgwAAACQeyJvcmlnaW4iOiJodHRwczovL2dvb2dsZXRhZ3NlcnZpY2VzLmNvbTo0NDMiLCJmZWF0dXJlIjoiQUlQcm9tcHRBUElNdWx0aW1vZGFsSW5wdXQiLCJleHBpcnkiOjE3NzQzMTA0MDAsImlzU3ViZG9tYWluIjp0cnVlLCJpc1RoaXJkUGFydHkiOnRydWV9">
+<script src="https://lchzh3473.github.io/lib/webp-bundle.js" crossorigin="anonymous">
+<style type="text/css">
+</style>
+<style type="text/css">
+</style>
 </head>
-
-<body class="mdui-appbar-with-toolbar mdui-drawer-body-left mdui-theme-primary-blue-grey mdui-theme-accent-blue mdui-theme-layout-auto">
-    
-    <!-- 顶栏 -->
-    <header class="mdui-appbar mdui-appbar-fixed mdui-shadow-1">
-        <div class="mdui-toolbar mdui-color-theme">
-            <button onclick="drawerInst.toggle()" class="mdui-btn mdui-btn-icon mdui-ripple">
-                <i class="mdui-icon material-icons">menu</i>
-            </button>
-            <a href="#" onclick="window.scrollTo(0,0);return false;" class="mdui-typo-title">Ph1gr0s Emulator <span style="opacity: 0.7; font-size: 0.8em;">v0.1.11 Alpha</span></a>
-        </div>
-    </header>
-
-    <!-- 侧边抽屉 -->
-    <aside class="mdui-drawer" id="drawer">
-        <div class="mdui-list" mdui-collapse="{accordion: true}">
-            <div class="mdui-subheader">导航</div>
-            <a href="../index.html" target="_blank" class="mdui-list-item mdui-ripple">
-                <i class="mdui-list-item-icon mdui-icon material-icons">home</i>
-                <div class="mdui-list-item-content">首页</div>
-            </a>
-            <div class="mdui-divider"></div>
-            <a href="../bbs" target="_blank" class="mdui-list-item mdui-ripple">
-                <i class="mdui-list-item-icon mdui-icon material-icons">forum</i>
-                <div class="mdui-list-item-content">交流社区</div>
-            </a>
-            <a href="../market" target="_blank" class="mdui-list-item mdui-ripple">
-                <i class="mdui-list-item-icon mdui-icon material-icons">store</i>
-                <div class="mdui-list-item-content">谱面市场</div>
-            </a>
-            <div class="mdui-divider"></div>
-            <div class="mdui-subheader">工具</div>
-            <a onclick="showDeviceInfo()" class="mdui-list-item mdui-ripple">
-                <i class="mdui-list-item-icon mdui-icon material-icons">important_devices</i>
-                <div class="mdui-list-item-content">设备信息</div>
-            </a>
-            <a href="./latency_test.html" target="_blank" class="mdui-list-item mdui-ripple">
-                <i class="mdui-list-item-icon mdui-icon material-icons">timer</i>
-                <div class="mdui-list-item-content">延迟自测工具</div>
-            </a>
-            <div class="mdui-divider"></div>
-            <a href="../credits.html" target="_blank" class="mdui-list-item mdui-ripple">
-                <i class="mdui-list-item-icon mdui-icon material-icons">people</i>
-                <div class="mdui-list-item-content">制作人员名单</div>
-            </a>
-        </div>
-    </aside>
-
-    <main class="mdui-container mdui-p-b-5">
-        <!-- 停更通知卡片 -->
-        <div class="mdui-card card-warning mdui-m-t-2 mdui-m-b-2">
-            <div class="mdui-card-primary">
-                <div class="mdui-card-primary-title"><i class="mdui-icon material-icons" style="margin-top:-4px">info_outline</i> 本项目已不再维护</div>
-            </div>
-            <div class="mdui-card-content mdui-typo mdui-p-t-0">
-                <p>建议使用最新核心：<a href="https://github.com/MisaLiu/phi-chart-render">MisaLiu/phi-chart-render</a>。</p>
-            </div>
-        </div>
-
-        <!-- 配置面板组 -->
-        <div class="mdui-panel" id="panel" mdui-panel>
-            
-            <!-- 0. 加载资源 -->
-            <section class="mdui-panel-item mdui-panel-item-open" id="panel-load-resources">
-                <div class="mdui-panel-item-header">0. 加载资源</div>
-                <div class="mdui-panel-item-body">
-                    <div id="loading-sources">
-                        <p class="mdui-m-b-1">正在初始化引擎环境...</p>
-                        <div class="mdui-progress">
-                            <div class="mdui-progress-indeterminate"></div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 1. 文件选择 -->
-            <section class="mdui-panel-item" id="panel-select-chart-zip">
-                <div class="mdui-panel-item-header">1. 选择谱面文件</div>
-                <div class="mdui-panel-item-body">
-                    <div class="mdui-valign mdui-flex-column">
-                        <button onclick="selectZip()" class="mdui-btn mdui-btn-raised mdui-ripple mdui-color-theme-accent mdui-m-y-2" id="button-select-chart-zip">
-                            <i class="mdui-icon material-icons">insert_drive_file</i> 选择 .zip 谱面
-                        </button>
-                    </div>
-                    <input type="file" class="mdui-hidden" id="input-select-chart" />
-                    
-                    <div class="mdui-hidden" id="loading-chart-group">
-                        <div class="mdui-m-t-2" id="loading-chart-zip">
-                            <div class="text mdui-text-truncate">读取压缩包...</div>
-                            <div class="mdui-progress"><div class="mdui-progress-indeterminate"></div></div>
-                        </div>
-                        <div class="mdui-m-t-2" id="loading-decode-chart">
-                            <div class="text mdui-text-truncate">解析谱面数据...</div>
-                            <div class="mdui-progress"><div class="mdui-progress-indeterminate"></div></div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 2. 谱面信息确认 -->
-            <section class="mdui-panel-item" id="panel-select-chart-info">
-                <div class="mdui-panel-item-header">2. 确认谱面信息</div>
-                <div class="mdui-panel-item-body mdui-p-a-0">
-                    <div class="mdui-list">
-                        <label onclick="openMenu(this, 'menu-chart-file')" class="mdui-list-item mdui-ripple">
-                            <i class="mdui-list-item-icon mdui-icon material-icons">insert_drive_file</i>
-                            <div class="mdui-list-item-content">
-                                <div class="mdui-list-item-title">谱面文件</div>
-                                <div class="mdui-list-item-text" id="list-text-chart-file">等待导入...</div>
-                            </div>
-                        </label>
-                        <div class="mdui-menu" id="menu-chart-file"><div class="mdui-menu-item" disabled><a class="mdui-ripple">请先导入文件</a></div></div>
-
-                        <!-- 其他列表项保持功能一致 -->
-                        <div class="mdui-p-x-2">
-                            <div class="mdui-textfield mdui-textfield-floating-label">
-                                <i class="mdui-icon material-icons">music_note</i>
-                                <label class="mdui-textfield-label">谱面名称</label>
-                                <input onchange="_chart.info.name = this.value" class="mdui-textfield-input" type="text" id="input-chart-name" />
-                            </div>
-                            <div class="mdui-textfield mdui-textfield-floating-label">
-                                <i class="mdui-icon material-icons">trending_up</i>
-                                <label class="mdui-textfield-label">谱面难度</label>
-                                <input onchange="_chart.info.level = this.value" class="mdui-textfield-input" type="text" id="input-chart-difficulty" />
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="mdui-panel-item-actions">
-                        <button onclick="switchPanel(1)" class="mdui-btn mdui-ripple">上一步</button>
-                        <button onclick="switchPanel(3)" class="mdui-btn mdui-ripple mdui-text-color-theme-accent">下一步</button>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 3. 图像设置 -->
-            <section class="mdui-panel-item" id="panel-settings-graphic">
-                <div class="mdui-panel-item-header">3. 图像设置</div>
-                <div class="mdui-panel-item-body">
-                    <div class="mdui-list">
-                        <label class="mdui-list-item mdui-ripple">
-                            <div class="mdui-list-item-content">显示背景图</div>
-                            <div class="mdui-checkbox">
-                                <input oninput="settings.background = this.checked" type="checkbox" id="settings-graphics-enable-bg" checked/>
-                                <i class="mdui-checkbox-icon"></i>
-                            </div>
-                        </label>
-                        <li class="mdui-list-item">
-                            <div class="mdui-list-item-content">背景图亮度</div>
-                            <div class="mdui-slider mdui-m-l-2" style="flex:2">
-                                <input oninput="settings.backgroundDim = this.value / 100" type="range" step="1" min="0" max="100" value="75" />
-                            </div>
-                        </li>
-                        <!-- 更多设置项依照此模板 -->
-                    </div>
-                    <div class="mdui-panel-item-actions">
-                        <button onclick="switchPanel(2)" class="mdui-btn mdui-ripple">上一步</button>
-                        <button onclick="switchPanel(4)" class="mdui-btn mdui-ripple mdui-text-color-theme-accent">下一步</button>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 4 & 5 略 (保持原有逻辑即可，建议参考 3 的布局优化) -->
-
-            <!-- 6. 模拟器运行 -->
-            <section class="mdui-panel-item" id="panel-game">
-                <div class="mdui-panel-item-header">6. 模拟器</div>
-                <div class="mdui-panel-item-body">
-                    <div id="game-canvas-box" class="mdui-center mdui-m-y-2">
-                        <!-- JS 动态填入内容 -->
-                    </div>
-                    
-                    <div class="mdui-row-xs-2 mdui-row-sm-3 mdui-m-t-2">
-                        <div class="mdui-col mdui-m-b-1">
-                            <button onclick="gamePause()" id="game-btn-pause" class="mdui-btn mdui-btn-block mdui-btn-raised mdui-ripple">继续/暂停</button>
-                        </div>
-                        <div class="mdui-col mdui-m-b-1">
-                            <button onclick="gameRestart()" class="mdui-btn mdui-btn-block mdui-btn-raised mdui-ripple mdui-color-orange">重试</button>
-                        </div>
-                        <div class="mdui-col mdui-m-b-1">
-                            <button onclick="setCanvasFullscreen()" class="mdui-btn mdui-btn-block mdui-btn-raised mdui-ripple mdui-color-blue">全屏</button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </div>
-    </main>
-
-    <!-- 弹窗控件 -->
-    <div class="mdui-dialog" id="msg-box">
-        <div class="mdui-dialog-title">系统信息</div>
-        <div class="mdui-dialog-content">暂无消息</div>
-        <div class="mdui-dialog-actions">
-            <button class="mdui-btn mdui-ripple" mdui-dialog-close>确定</button>
-        </div>
-    </div>
-
-    <!-- 悬浮通知按钮 -->
-    <button onclick="console.openMsgBox()" class="mdui-fab mdui-fab-fixed mdui-ripple mdui-color-pink mdui-fab-hide" id="msg-btn">
-        <i class="mdui-icon material-icons">notifications</i>
-    </button>
-
-    <script>
-        // 快捷调用设备信息
-        function showDeviceInfo() {
-            mdui.alert(
-                `<div class='mdui-typo-body-1'>
-                    <b>系统：</b>${DeviceInfo.system} ${DeviceInfo.systemVersion}<br>
-                    <b>浏览器：</b>${DeviceInfo.browser} (${DeviceInfo.browserEngine})<br>
-                    <b>WebGL：</b>${DeviceInfo.supportWebGL ? '✅ 支持' : '❌ 不支持'}
-                </div>`, 
-                '设备信息'
-            );
-        }
-
-        // 初始化
-        document.getElementById('settings-graphics-resolution').value = settings.resolution;
-        var drawerInst = new mdui.Drawer('#drawer');
-    </script>
-    
-    <script src="./js/main.js?v=0.1.5"></script>
+<body>
+<noscript>
+"<strong style="color: #f00">此浏览器不支持JavaScript，该脚本无法运行。</strong>"
+</noscript>
+<div class="index">
+<div class="main" style="display: block;">…</div>
+<p class="footer">© 2020-2024 lchzh3473</p>
+</div>
+<ins class="adsbygoogle adsbygoogle-noablate" data-ad-hi="true" data-adsbygoogle-status="done" style="display: none !important;" data-ad-status="unfilled">
+<div id="aswift_0_host" style="border: medium; height: 0px; width: 0px; margin: 0px; padding: 0px; position: relative; visibility: visible; background-color: transparent; display: inline-block;">
+<iframe id="aswift_0" name="aswift_0" style="left:0;position:absolute;top:0;border:0;width:undefinedpx;height:undefinedpx;min-height:auto;max-height:none;min-width:auto;max-width:none;" sandbox="allow-forms allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts allow-top-navigation-by-user-activation" frameborder="0" marginwidth="0" marginheight="0" vspace="0" hspace="0" allowtransparency="true" scrolling="no" src="https://googleads.g.doubleclick.net/pagead/ads?client=ca-pub-8369333813205733&output=html&adk=1812271804&adf=3025194257&lmt=1739548486&plat=9%3A32776%2C16%3A8388608%2C17%3A32%2C24%3A32%2C25%3A32%2C30%3A1081344%2C32%3A32%2C41%3A32%2C42%3A32%2C43%3A32&format=0x0&url=https%3A%2F%2Flchzh3473.github.io%2Fsim-phi%2F&pra=5&asro=0&aiactd=0&aicctd=0&ailctd=0&aimartd=4&abgtt=6&dt=1778982591618&bpp=3&bdt=747&idt=325&shv=r20260512&mjsv=m202605120101&ptt=9&saldr=aa&abxe=1&cookie_enabled=1&eoidce=1&nras=1&correlator=4223069609651&frm=20&pv=2&u_tz=480&u_his=1&u_h=892&u_w=1366&u_ah=892&u_aw=1366&u_cd=24&u_sd=2&adx=-12245933&ady=-12245933&biw=1366&bih=892&scr_x=0&scr_y=0&eid=42532523%2C42533294%2C95390278%2C95390680&oid=2&pvsid=3536773784759349&tmod=221185378&uas=0&nvt=1&fsapi=1&fc=1920&brdim=0%2C0%2C0%2C0%2C1366%2C0%2C1366%2C892%2C1366%2C892&vis=1&rsz=%7C%7Cs%7C&abl=NS&fu=32768&bc=31&plas=430x700_l%7C430x700_r&bz=1&ifi=1&uci=a!1&fsb=1&dtd=349" data-google-container-id="a!1" tabindex="0" title="Advertisement" aria-label="Advertisement" data-load-complete="true">
+</div>
+</ins>
+<script src="https://www.googletagmanager.com/gtag/js?id=G-K98WR056RJ">
+<iframe src="https://www.google.com/recaptcha/api2/aframe" width="0" height="0" style="display: none;">
 </body>
+<iframe id="google_esf" name="google_esf" src="https://googleads.g.doubleclick.net/pagead/html/r20260512/r20190131/zrt_lookup_fy2021.html" style="display: none;">
+<div style="all: initial;">
 </html>
