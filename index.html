@@ -1,309 +1,343 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>phi-chart-render</title>
-        <meta name="description" content="A Phigros chart render based on Pixi.js" />
-        <meta name="author" content="MisaLiu" />
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width" />
-        <link rel="shortcut icon" href="./icons/favicon.ico" />
-        <link href="src/style/index.css" rel="stylesheet" />
-        <!--script src="./eruda.min.js"></script>
-        <script>eruda.init();</script-->
-        <script>
-            // 全屏相关。代码来自 lchzh3473
-            const fullscreen = {
-                // 切换全屏状态
-                toggle(elem, inDocument = false) {
-                    // if (!this.enabled) return false;
-                    if (this.element) {
-                        if (!inDocument) {
-                            if (document.exitFullscreen) return document.exitFullscreen();
-                            if (document.cancelFullScreen) return document.cancelFullScreen();
-                            if (document.webkitCancelFullScreen) return document.webkitCancelFullScreen();
-                            if (document.mozCancelFullScreen) return document.mozCancelFullScreen();
-                            if (document.msExitFullscreen) return document.msExitFullscreen();
-                        }
-                        
-                        if (this.element == elem) {
-                            elem.style.position = 'relative';
-                            elem.style.top = 'unset';
-                            elem.style.left = 'unset';
-                            elem.style.zIndex = 'unset';
-                            document.body.style.overflow = 'auto';
-                            
-                            document.inDocumentFullscreenElement = null;
-                            if (global.functions.resizeCanvas) global.functions.resizeCanvas();
-                            return true;
-                        }
-                        
-                        return false;
-                        
-                    } else {
-                        if (!inDocument) {
-                            if (!(elem instanceof HTMLElement)) elem = document.body;
-                            if (elem.requestFullscreen) return elem.requestFullscreen();
-                            if (elem.webkitRequestFullscreen) return elem.webkitRequestFullscreen();
-                            if (elem.mozRequestFullScreen) return elem.mozRequestFullScreen();
-                            if (elem.msRequestFullscreen) return elem.msRequestFullscreen();
-                        }
-                        
-                        if (elem != document.body) {
-                            elem.style.position = 'fixed';
-                            elem.style.top = '0';
-                            elem.style.left = '0';
-                            elem.style.zIndex = '5050';
-                            document.body.style.overflow = 'hidden';
-                            
-                            document.inDocumentFullscreenElement = elem;
-                            if (global.functions.resizeCanvas) global.functions.resizeCanvas();
-                            return true;
-                        }
-                        
-                        return false;
-                    }
-                },
-                
-                // 检查当前全屏的元素
-                check(elem) {
-                    if (!(elem instanceof HTMLElement)) elem = document.body;
-                    return this.element == elem;
-                },
-                
-                // 返回当前浏览器的全屏组件。
-                get element() {
-                    return document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement || document.inDocumentFullscreenElement;
-                },
-                
-                // 返回当前浏览器是否支持全屏 API。
-                get enabled() {
-                    return !!(document.fullscreenEnabled || document.webkitFullscreenEnabled || document.mozFullScreenEnabled || document.msFullscreenEnabled);
-                },
-                
-                // 返回当前的全屏模式。2 == 网页内全屏，1 == API 全屏，0 == 没有开启全屏
-                get type() {
-                    if (document.inDocumentFullscreenElement) {
-                        return 2;
-                    } else if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) {
-                        return 1;
-                    } else {
-                        return 0;
-                    }
-                }
-            };
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Phira Mini Web Simulator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        #canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* 让点击穿透到Canvas */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+            color: #fff;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 18px;
+            letter-spacing: 1px;
+        }
+        #combo-container {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.1s;
+        }
+        #combo-num {
+            font-size: 45px;
+            font-weight: bold;
+            font-style: italic;
+        }
+        #combo-text {
+            font-size: 12px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+        #start-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 15px 40px;
+            font-size: 18px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid #fff;
+            border-radius: 30px;
+            cursor: pointer;
+            pointer-events: auto;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s;
+        }
+        #start-btn:hover {
+            background: #fff;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
 
-            function getSearchString(name)
-            {
-                let searchString = window.location.search.substring(1, window.location.search.length);
-                let searchStrings = searchString.split('&');
+    <canvas id="canvas"></canvas>
 
-                if (!name || name == '') return null;
-                if (searchStrings.length <= 0) return null;
-
-                for (const singleString of searchStrings)
-                {
-                    if (singleString.indexOf(name + '=') >= 0)
-                    {
-                        let stringValue = singleString.replace(name + '=', '');
-                        return decodeURIComponent(stringValue);
-                    }
-                }
-
-                return null;
-            }
-
-            if (getSearchString('debug') === 'true')
-            {
-                let xhr = new XMLHttpRequest();
-
-                xhr.onreadystatechange = () =>
-                {
-                    if (xhr.readyState === 4 && xhr.status === 200)
-                    {
-                        eval(xhr.responseText);
-                        window.vConsole = new window.VConsole();
-
-                        console.warn(
-                            'You\'re using debug mode, which will enable vConsole for mobile device debuging.\n' +
-                            'You SHOULDN\'T use debug mode in normal use, and don\'t run ANY code here from people that you don\'t know.'
-                        );
-                        console.warn(
-                            '你正在使用 debug 模式，该模式将启用 vConsole 以方便在移动设备上进行调试。\n' +
-                            '你【不应该】在正常使用中启用 debug 模式，并不要在这里运行【任何】来自你不认识的人的代码。'
-                        );
-                    }
-                }
-
-                xhr.open('GET', 'https://cdn.bootcdn.net/ajax/libs/vConsole/3.15.0/vconsole.min.js');
-                xhr.send();
-            }
-        </script>
-    </head>
-    <body>
-        <div class="file-select">
-            <div>
-                <b>For iOS users:</b><br>
-                Please use Quark Browser for better experience (not ad) .
-            </div>
-            <hr />
-            <div>
-                Due to some performance issue on FireFox Android, consider using <a href="https://github.com/kiwibrowser/src.next/releases" target="_blank">Kiwi Browser</a> or <a href="https://viayoo.com/" target="_blank">Via</a> or <a href="https://www.google.com/chrome/" target="_blank">Google Chrome</a>.
-            </div>
-            <hr />
-            <a href="https://t.bilibili.com/820800655803285656" target="_blank">致中国大陆用户的公告</a>
-            <hr />
-            <div class="loading" id="loading-status">Loading scripts...</div>
-            <hr />
-            <div class="tab">
-                <div class="bar">
-                    <div data-tab-id="file" class="active">File</div>
-                    <div data-tab-id="visual">Visual</div>
-                    <div data-tab-id="sound">Sound</div>
-                    <div data-tab-id="other">Other</div>
-                    <div data-tab-id="phizone">PhiZone</div>
-                </div>
-                <div class="content">
-                    <div id="tab-file">
-                        <label>Select chart file(s): <input type="file" id="file-chart-pack" multiple disabled></label><br>
-                        <div class="loading" id="file-read-progress">Please wait until assets loaded...</div>
-                        <hr />
-                        <label>Chart: <select id="file-chart"></select></label><br>
-                        <label>Music: <select id="file-music"></select></label><br>
-                        <label>BG: <select id="file-bg"></select></label>
-                    </div>
-                    <div id="tab-visual">
-                        <label>Custom skin pack: <input type="file" id="file-skin-pack" disabled /></label>&nbsp;<a href="./skin.example.zip" download="skin.example.zip">Download example skin pack</a><br>
-                        <div class="loading" id="loading-skin-pack">No skinpack selected.</div>
-                        <hr />
-                        <label><input type="checkbox" id="settings-show-bg" checked />Show BG</label><br>
-                        <label><input type="checkbox" id="settings-multi-note-hl" checked />Highlight same time notes</label><br>
-                        <label><input type="checkbox" id="settings-show-ap-status" checked />Show AP status</label><br>
-                        <label><input type="checkbox" id="settings-show-input-point" checked />Show input point</label><br>
-                        <label><input type="checkbox" id="settings-anti-alias" checked />Anti-alias</label><br>
-                        <label><input type="checkbox" id="settings-low-resolution" />Low resolution mode</label><br>
-                        <label><input type="checkbox" id="settings-prpr-extra" checked />Use prpr's extra.json (experimental)</label>
-                        <hr />
-                        <label>BG quality: <select id="settings-bg-quality">
-                            <option value="0">Low (480P)</option>
-                            <option value="1" default selected>Medium (720P)</option>
-                            <option value="2">High (1080P)</option>
-                            <option value="3">Original</option>
-                        </select></label>
-                        <hr />
-                        <label>Note scale: <input type="range" id="settings-note-scale" min="0" max="4000" value="2000"></label><br>
-                        <label>Background dim: <input type="range" id="settings-bg-dim" min="0" max="1" step="0.01" value="0.5"></label><br>
-                        <label>BG blur: <input type="range" id="settings-bg-blur" min="0" max="100" value="50" /></label>
-                    </div>
-                    <div id="tab-sound">
-                        <label>Chart offset: <input type="number" id="settings-audio-offset" placeholder="0" style="width:4em" />ms</label><br>
-                        <div style="margin-left:20px">(recommended 100ms for Chrome/Chrome based browsers)</div>
-                        <button id="settings-test-input-delay">Tap on this button to test input delay...</button><br>
-                        <label><input type="checkbox" id="settings-use-browser-latency" />Use browser's output latency (experimental)</label><br>
-                        <label>Speed: <input type="range" id="settings-audio-speed" min="0.25" max="1.75" step="0.25" value="1"></label><br>
-                        <hr />
-                        <label><input type="checkbox" id="settings-hitsound" checked />Hitsound</label><br>
-                        <label>Hitsound volume: <input type="range" id="settings-hitsound-volume" min="0" max="1" step="0.01" value="1"></label><br>
-                    </div>
-                    <div id="tab-other">
-                        <label><input type="checkbox" id="settings-challenge-mode" />Challenge Mode</label><br>
-                        <label><input type="checkbox" id="settings-plyndb" />Play like you never did before</label><br>
-                        <label><input type="checkbox" id="settings-autoplay" />AutoPlay</label><br>
-                        <label><input type="checkbox" id="settings-debug" />Debug</label><br>
-                    </div>
-                    <div id="tab-phizone">
-                        <label>Paste chart link/ID from <a href="https://www.phi.zone/" target="_href">PhiZone</a> here: <input id="phizone-chart-link" /></label>
-                        <button id="phizone-download-chart">Download</button>
-                        <hr />
-                        <div class="loading" id="phizone-download-progress">No download task</div>
-                    </div>
-                </div>
-            </div>
-            <hr />
-            <button id="start" disabled>Start</button>
-            <hr />
-            Current version: <%= GIT_VERSION %><br>
-            GitHub homepage: <a href="https://github.com/MisaLiu/phi-chart-render" target="_blank">https://github.com/MisaLiu/phi-chart-render</a><br>
-            Report bugs <a href="https://github.com/MisaLiu/phi-chart-render/issues/new/choose" target="_blank">Here</a>
-            <hr />
-            Consider <a href="https://patreon.com/HIMlaoS_Misa" target="_blank">support me on Patreon</a> if you like!<br />
-            喜欢的话可以到 <a href="https://afdian.net/a/MisaLiu" target="_blank">爱发电</a> 支持一下！
-            <hr />
-            We uses <a href="https://sentry.io" target="_blank">Sentry.io</a> and <a href="https://analytics.google.com/" target="_blank">Google Analytics</a> to tracking errors and analyze user usage data.
-
-            <button onclick="fullscreen.toggle(document.body, false)" class="fullscreen" id="fullscreen">Fullscreen</button>
+    <div id="ui-layer">
+        <div class="header">
+            <div id="track-name">Spitfire - Auto Simulation</div>
+            <div id="score">0000000</div>
         </div>
-
-        <div class="debug-value"></div>
         
-        <div class="play-result">
-            <div class="bg-shadow-cover top"></div>
-            <div class="bg-shadow-cover"></div>
+        <div id="combo-container">
+            <div id="combo-num">0</div>
+            <div id="combo-text">Combo</div>
+        </div>
 
-            <div class="song-info">
-                <div class="title">Song name</div>
-                <div class="subtitle artist">Artist</div>
-                <div class="subtitle diff">SP Lv.?</div>
-            </div>
+        <button id="start-btn">点击初始化并开始</button>
+    </div>
 
-            <div class="judge-icon">S</div>
-            <div class="extra-info">FULL COMBO</div>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const startBtn = document.getElementById('start-btn');
+        const scoreEl = document.getElementById('score');
+        const comboContainer = document.getElementById('combo-container');
+        const comboNumEl = document.getElementById('combo-num');
+
+        // --- 游戏配置参数 ---
+        let isPlaying = false;
+        let startTime = 0;
+        let currentTime = 0; // 当前音乐进度 (秒)
+        let score = 0;
+        let combo = 0;
+        
+        // 谱面流速参数：1秒钟Note走过的像素距离 (iPad上建议根据屏幕高度动态调整)
+        let speed = 400; 
+
+        // --- Web Audio API 初始化 (防止浏览器拦截音频) ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let audioBuffer = null;
+        let audioSource = null;
+
+        // 简易伪采样：生成一个小节的电子鼓点作为背景音乐数据
+        function createDummyAudio() {
+            const sampleRate = audioCtx.sampleRate;
+            const duration = 15; // 模拟音频长15秒
+            const buffer = audioCtx.createBuffer(1, sampleRate * duration, sampleRate);
+            const data = buffer.getChannelData(0);
             
-            <div class="info-bar score">
-                <div class="score">1000000</div>
-                <div class="acc">Accuracy 100.00%</div>
-            </div>
+            // 在特定时间点生成“啪”的节拍声，方便对准音游节拍
+            for (let i = 0; i < duration; i += 0.5) {
+                const startIdx = Math.floor(i * sampleRate);
+                for (let j = 0; j < 2000; j++) {
+                    if (startIdx + j < data.length) {
+                        data[startIdx + j] = Math.sin(j * 0.5) * Math.exp(-j * 0.01);
+                    }
+                }
+            }
+            audioBuffer = buffer;
+        }
 
-            <div class="info-bar acc-bar">
-                <div class="judge-histogram">
-                    <div class="center"></div>
-                </div>
-            </div>
+        // --- 模拟谱面数据 (Chart Data) ---
+        // time: 击打时间(秒), xOffset: 相对于判定线中心的横向偏移
+        const mockChart = [
+            { time: 1.0, xOffset: -200, hit: false },
+            { time: 1.5, xOffset: 0, hit: false },
+            { time: 2.0, xOffset: 200, hit: false },
+            { time: 2.5, xOffset: -100, hit: false },
+            { time: 2.5, xOffset: 100, hit: false }, // 双押
+            { time: 3.0, xOffset: 0, hit: false },
+            { time: 3.5, xOffset: -300, hit: false },
+            { time: 4.0, xOffset: 300, hit: false },
+            { time: 4.5, xOffset: -150, hit: false },
+            { time: 5.0, xOffset: 150, hit: false },
+            { time: 5.5, xOffset: 0, hit: false },
+            { time: 6.0, xOffset: -200, hit: false },
+            { time: 6.5, xOffset: 200, hit: false },
+            { time: 7.0, xOffset: 0, hit: false },
+            { time: 7.5, xOffset: -100, hit: false },
+            { time: 8.0, xOffset: 100, hit: false },
+            { time: 8.5, xOffset: 0, hit: false },
+            { time: 9.0, xOffset: -250, hit: false }
+        ];
 
-            <div class="info-bar detail">
-                <div class="detail">
-                    <div class="detail-single">
-                        <div class="type">Perfect</div>
-                        <div class="value perfect">100</div>
-                    </div>
-                    <div class="detail-single">
-                        <div class="type">Good</div>
-                        <div class="value good">0</div>
-                    </div>
-                    <div class="detail-single">
-                        <div class="type">Bad</div>
-                        <div class="value bad">0</div>
-                    </div>
-                    <div class="detail-single">
-                        <div class="type">Miss</div>
-                        <div class="value miss">0</div>
-                    </div>
-                </div>
-                <div class="max-combo">Max Combo 100</div>
-            </div>
+        // --- 自适应屏幕大小 ---
+        function resizeCanvas() {
+            canvas.width = window.innerWidth * window.devicePixelRatio;
+            canvas.height = window.innerHeight * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
 
-            <div class="actions">
-                <button onclick="history.go(0)">Refresh</button>
-                <button class="big highlight" onclick="restartGame()">Restart</button>
-                <button class="big highlight" onclick="exitGame()">Exit</button>
-            </div>
-        </div>
+        // --- 核心业务逻辑：自动打谱 (Auto-Play) 与 状态更新 ---
+        function update() {
+            if (!isPlaying) return;
 
-        <div class="game-paused">
-            <div class="title">Game paused</div>
-            <div class="action">
-                <button onclick="fullscreen.toggle(document.body, false)">Fullscreen</button>
-                <button onclick="exitGame()">Exit</button>
-                <button onclick="restartGame()">Restart</button>
-                <button onclick="pauseGame()">Continue</button>
-            </div>
-        </div>
+            // 计算当前绝对精确的音乐播放时间
+            currentTime = audioCtx.currentTime - startTime;
 
-        <div class="error-window">
-            <div>An error has just occurred, if you're sure this is not caused by you, please <a href="https://github.com/MisaLiu/phi-chart-render/issues/new/choose" target="_blank">report it on GitHub</a>. <!--a href="#" onclick="eruda.show();return false;">Show Eruda</a--><button class="close">Close</button></div>
-            <pre><code class="content">Test Text Not A Real Error</code></pre>
-            <div>The infomation about this error will upload to <a href="https://sentry.io" target="_blank">Sentry.io</a> for analyze and debug.</div>
-        </div>
+            // 自动判定逻辑
+            mockChart.forEach(note => {
+                // 如果当前时间已经达到了 Note 的击打时间，且该 Note 还没被击碎
+                if (currentTime >= note.time && !note.hit) {
+                    note.hit = true; // 标记为已击中
+                    combo++;
+                    // Phigros 满分 1000000，按比例均分
+                    score = Math.floor((mockChart.filter(n => n.hit).length / mockChart.length) * 1000000);
+                    
+                    // 更新UI
+                    scoreEl.innerText = String(score).padStart(7, '0');
+                    comboNumEl.innerText = combo;
+                    comboContainer.style.opacity = combo > 0 ? '1' : '0';
+                    
+                    // 触发一个判定线打击视觉反馈（可以扩展粒子特效）
+                    triggerHitEffect();
+                }
+            });
 
-        <script type="module" src="/src/index.js"></script>
-    </body>
+            // 结束判定
+            if (currentTime > mockChart[mockChart.length - 1].time + 1) {
+                isPlaying = false;
+                startBtn.style.display = 'block';
+                startBtn.innerText = '重播';
+            }
+        }
+
+        // 打击特效标志位
+        let hitFlash = 0;
+        function triggerHitEffect() {
+            hitFlash = 1.0;
+        }
+
+        // --- Canvas 渲染引擎 ---
+        function render() {
+            const width = canvas.width / window.devicePixelRatio;
+            const height = canvas.height / window.devicePixelRatio;
+
+            // 1. 清空画布
+            ctx.fillStyle = '#0a0a14'; 
+            ctx.fillRect(0, 0, width, height);
+
+            // 绘制背景装饰线（类似Phira的科技感背景）
+            ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+            ctx.lineWidth = 1;
+            for(let i=0; i<width; i+=40) {
+                ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, height); ctx.stroke();
+            }
+
+            // 2. 确定判定线（Judge Line）的位置
+            // Phigros的判定线可以任意移动，这里我们默认将其初始化在屏幕 Y = 70% 的位置
+            const judgeLineY = height * 0.7;
+            const centerX = width / 2;
+
+            // 绘制判定线本身
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(0, judgeLineY);
+            ctx.lineTo(width, judgeLineY);
+            ctx.stroke();
+
+            // 绘制自动打谱提示 (AutoPlay 字符)
+            ctx.fillStyle = 'rgba(0, 229, 255, 0.4)';
+            ctx.font = 'bold 14px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('- AUTO PLAY -', centerX, judgeLineY + 30);
+
+            // 绘制打击高亮特效
+            if (hitFlash > 0) {
+                ctx.fillStyle = `rgba(0, 229, 255, ${hitFlash * 0.2})`;
+                ctx.fillRect(0, judgeLineY - 10, width, 20);
+                hitFlash -= 0.05; // 渐隐
+            }
+
+            // 3. 渲染谱面当中的 Note
+            mockChart.forEach(note => {
+                // 如果已经击碎超过0.15秒，就不再渲染
+                if (note.hit && (currentTime - note.time > 0.15)) return;
+
+                // 计算 Note 当前与判定线的距离 = (Note时间 - 当前时间) * 流速
+                // 如果 currentTime < note.time，distance > 0 (在判定线上方往下掉)
+                const distance = (note.time - currentTime) * speed;
+                const noteY = judgeLineY - distance; 
+                const noteX = centerX + noteOffsetScale(note.xOffset, width);
+
+                if (!note.hit) {
+                    // 绘制常规蓝色 Tap Note (仿照 Phigros 经典样式)
+                    const noteWidth = 110;
+                    const noteHeight = 12;
+
+                    ctx.save();
+                    ctx.translate(noteX, noteY);
+
+                    // Note 主体层
+                    ctx.fillStyle = '#5ce1e6';
+                    ctx.fillRect(-noteWidth/2, -noteHeight/2, noteWidth, noteHeight);
+                    
+                    // Note 边框线提高质感
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 1.5;
+                    ctx.strokeRect(-noteWidth/2, -noteHeight/2, noteWidth, noteHeight);
+
+                    ctx.restore();
+                } else {
+                    // 如果被击中，渲染粒子爆裂动画
+                    const progress = (currentTime - note.time) / 0.15; // 0 ~ 1 进度
+                    ctx.fillStyle = `rgba(92, 225, 230, ${1 - progress})`;
+                    ctx.beginPath();
+                    ctx.arc(noteX, judgeLineY, progress * 40, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
+        }
+
+        // 根据屏幕宽度自适应缩放谱面坐标偏移
+        function noteOffsetScale(xOffset, canvasWidth) {
+            // 基准宽度设为 1024px 进行比例缩放
+            return xOffset * (canvasWidth / 1024);
+        }
+
+        // --- 主游戏循环 (Game Loop) ---
+        function loop() {
+            update();
+            render();
+            requestAnimationFrame(loop);
+        }
+
+        // --- 交互控制 ---
+        startBtn.addEventListener('click', async () => {
+            if (audioCtx.state === 'suspended') {
+                await audioCtx.resume();
+            }
+            
+            // 重置数据
+            score = 0;
+            combo = 0;
+            mockChart.forEach(n => n.hit = false);
+            scoreEl.innerText = "0000000";
+            comboContainer.style.opacity = '0';
+
+            // 创建并播放音频
+            createDummyAudio();
+            audioSource = audioCtx.createBufferSource();
+            audioSource.buffer = audioBuffer;
+            audioSource.connect(audioCtx.destination);
+            
+            startBtn.style.display = 'none';
+            startTime = audioCtx.currentTime;
+            isPlaying = true;
+            
+            audioSource.start(0);
+        });
+
+        // 启动渲染循环
+        requestAnimationFrame(loop);
+    </script>
+</body>
 </html>
