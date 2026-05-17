@@ -1,64 +1,309 @@
 <!DOCTYPE html>
 <html>
-<head>
-<!-- viewport-fit=cover:Fill the whole screen on iPhone X -->
-<meta charset="utf-8" name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>Phigros模拟器 - lchzh3473制作</title>
-<link rel="shortcut icon" href="./icon.svg">
-<link rel="manifest" href="./manifest.json">
-<link rel="stylesheet" href="/utils/style.css">
-<link rel="stylesheet" href="style.css">
-<script src="https://pagead2.googlesyndication.com/pagead/managed/js/adsense/m202605120101/show_ads_impl_fy2021.js">
-<script type="text/javascript" charset="UTF-8" async src="https://sdk.51.la/js-sdk-pro.min.js" id="LA_COLLECT">
-<script src="https://hm.baidu.com/hm.js?a2847526e110755a92e0ed1c8e948a32">
-<script>
-" if ('serviceWorker' in navigator) { navigator.serviceWorker.register('/service-worker.js').then(() => { console.log('Service Worker Registered'); }); } "
-</script>
-<script>
-" eval('try{eval("\'use strict\';{async(a=1)=>1}")}catch(e){location.href="/412.html"}'); "
-</script>
-<script src="/utils/main.js">
-<script>
-" (function() { var src = '//fastly.jsdelivr.net/npm/eruda'; if (!new URLSearchParams(location.search).has('test')) return; document.write('<scr' + 'ipt src="' + src + '"></scr' + 'ipt>'); document.write('<scr' + 'ipt>eruda.init();</scr' + 'ipt>'); })(); "
-</script>
-<script>
-" var _hmt = _hmt || []; (function() { var hm = document.createElement("script"); hm.src = "https://hm.baidu.com/hm.js?a2847526e110755a92e0ed1c8e948a32"; var s = document.getElementsByTagName("script")[0]; s.parentNode.insertBefore(hm, s); })(); "
-</script>
-<script>
-" window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-K98WR056RJ'); window.addEventListener('load', function(){ var s = document.createElement('script'); s.src = 'https://www.googletagmanager.com/gtag/js?id=G-K98WR056RJ'; document.body.appendChild(s); }); "
-</script>
-<script>
-"!function(p){"use strict";!function(t){var s=window,e=document,i=p,c="".concat("https:"===e.location.protocol?"https://":"http://","sdk.51.la/js-sdk-pro.min.js"),n=e.createElement("script"),r=e.getElementsByTagName("script")[0];n.type="text/javascript",n.setAttribute("charset","UTF-8"),n.async=!0,n.src=c,n.id="LA_COLLECT",i.d=n;var o=function(){s.LA.ids.push(i)};s.LA?s.LA.ids&&o():(s.LA=p,s.LA.ids=[],o()),r.parentNode.insertBefore(n,r)}()}({id:"Jj67QM9XKxdyBUKP",ck:"Jj67QM9XKxdyBUKP"});"
-</script>
-<script src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8369333813205733" crossorigin="anonymous" data-checked-head="true">
-<script type="module" src="script-1.5.9.2.js">
-<meta http-equiv="origin-trial" content="AlK2UR5SkAlj8jjdEc9p3F3xuFYlF6LYjAML3EOqw1g26eCwWPjdmecULvBH5MVPoqKYrOfPhYVL71xAXI1IBQoAAAB8eyJvcmlnaW4iOiJodHRwczovL2RvdWJsZWNsaWNrLm5ldDo0NDMiLCJmZWF0dXJlIjoiV2ViVmlld1hSZXF1ZXN0ZWRXaXRoRGVwcmVjYXRpb24iLCJleHBpcnkiOjE3NTgwNjcxOTksImlzU3ViZG9tYWluIjp0cnVlfQ==">
-<meta http-equiv="origin-trial" content="Amm8/NmvvQfhwCib6I7ZsmUxiSCfOxWxHayJwyU1r3gRIItzr7bNQid6O8ZYaE1GSQTa69WwhPC9flq/oYkRBwsAAACCeyJvcmlnaW4iOiJodHRwczovL2dvb2dsZXN5bmRpY2F0aW9uLmNvbTo0NDMiLCJmZWF0dXJlIjoiV2ViVmlld1hSZXF1ZXN0ZWRXaXRoRGVwcmVjYXRpb24iLCJleHBpcnkiOjE3NTgwNjcxOTksImlzU3ViZG9tYWluIjp0cnVlfQ==">
-<meta http-equiv="origin-trial" content="A9nrunKdU5m96PSN1XsSGr3qOP0lvPFUB2AiAylCDlN5DTl17uDFkpQuHj1AFtgWLxpLaiBZuhrtb2WOu7ofHwEAAACKeyJvcmlnaW4iOiJodHRwczovL2RvdWJsZWNsaWNrLm5ldDo0NDMiLCJmZWF0dXJlIjoiQUlQcm9tcHRBUElNdWx0aW1vZGFsSW5wdXQiLCJleHBpcnkiOjE3NzQzMTA0MDAsImlzU3ViZG9tYWluIjp0cnVlLCJpc1RoaXJkUGFydHkiOnRydWV9">
-<meta http-equiv="origin-trial" content="A93bovR+QVXNx2/38qDbmeYYf1wdte9EO37K9eMq3r+541qo0byhYU899BhPB7Cv9QqD7wIbR1B6OAc9kEfYCA4AAACQeyJvcmlnaW4iOiJodHRwczovL2dvb2dsZXN5bmRpY2F0aW9uLmNvbTo0NDMiLCJmZWF0dXJlIjoiQUlQcm9tcHRBUElNdWx0aW1vZGFsSW5wdXQiLCJleHBpcnkiOjE3NzQzMTA0MDAsImlzU3ViZG9tYWluIjp0cnVlLCJpc1RoaXJkUGFydHkiOnRydWV9">
-<meta http-equiv="origin-trial" content="A1S5fojrAunSDrFbD8OfGmFHdRFZymSM/1ss3G+NEttCLfHkXvlcF6LGLH8Mo5PakLO1sCASXU1/gQf6XGuTBgwAAACQeyJvcmlnaW4iOiJodHRwczovL2dvb2dsZXRhZ3NlcnZpY2VzLmNvbTo0NDMiLCJmZWF0dXJlIjoiQUlQcm9tcHRBUElNdWx0aW1vZGFsSW5wdXQiLCJleHBpcnkiOjE3NzQzMTA0MDAsImlzU3ViZG9tYWluIjp0cnVlLCJpc1RoaXJkUGFydHkiOnRydWV9">
-<script src="https://lchzh3473.github.io/lib/webp-bundle.js" crossorigin="anonymous">
-<style type="text/css">
-</style>
-<style type="text/css">
-</style>
-</head>
-<body>
-<noscript>
-"<strong style="color: #f00">此浏览器不支持JavaScript，该脚本无法运行。</strong>"
-</noscript>
-<div class="index">
-<div class="main" style="display: block;">…</div>
-<p class="footer">© 2020-2024 lchzh3473</p>
-</div>
-<ins class="adsbygoogle adsbygoogle-noablate" data-ad-hi="true" data-adsbygoogle-status="done" style="display: none !important;" data-ad-status="unfilled">
-<div id="aswift_0_host" style="border: medium; height: 0px; width: 0px; margin: 0px; padding: 0px; position: relative; visibility: visible; background-color: transparent; display: inline-block;">
-<iframe id="aswift_0" name="aswift_0" style="left:0;position:absolute;top:0;border:0;width:undefinedpx;height:undefinedpx;min-height:auto;max-height:none;min-width:auto;max-width:none;" sandbox="allow-forms allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts allow-top-navigation-by-user-activation" frameborder="0" marginwidth="0" marginheight="0" vspace="0" hspace="0" allowtransparency="true" scrolling="no" src="https://googleads.g.doubleclick.net/pagead/ads?client=ca-pub-8369333813205733&output=html&adk=1812271804&adf=3025194257&lmt=1739548486&plat=9%3A32776%2C16%3A8388608%2C17%3A32%2C24%3A32%2C25%3A32%2C30%3A1081344%2C32%3A32%2C41%3A32%2C42%3A32%2C43%3A32&format=0x0&url=https%3A%2F%2Flchzh3473.github.io%2Fsim-phi%2F&pra=5&asro=0&aiactd=0&aicctd=0&ailctd=0&aimartd=4&abgtt=6&dt=1778982591618&bpp=3&bdt=747&idt=325&shv=r20260512&mjsv=m202605120101&ptt=9&saldr=aa&abxe=1&cookie_enabled=1&eoidce=1&nras=1&correlator=4223069609651&frm=20&pv=2&u_tz=480&u_his=1&u_h=892&u_w=1366&u_ah=892&u_aw=1366&u_cd=24&u_sd=2&adx=-12245933&ady=-12245933&biw=1366&bih=892&scr_x=0&scr_y=0&eid=42532523%2C42533294%2C95390278%2C95390680&oid=2&pvsid=3536773784759349&tmod=221185378&uas=0&nvt=1&fsapi=1&fc=1920&brdim=0%2C0%2C0%2C0%2C1366%2C0%2C1366%2C892%2C1366%2C892&vis=1&rsz=%7C%7Cs%7C&abl=NS&fu=32768&bc=31&plas=430x700_l%7C430x700_r&bz=1&ifi=1&uci=a!1&fsb=1&dtd=349" data-google-container-id="a!1" tabindex="0" title="Advertisement" aria-label="Advertisement" data-load-complete="true">
-</div>
-</ins>
-<script src="https://www.googletagmanager.com/gtag/js?id=G-K98WR056RJ">
-<iframe src="https://www.google.com/recaptcha/api2/aframe" width="0" height="0" style="display: none;">
-</body>
-<iframe id="google_esf" name="google_esf" src="https://googleads.g.doubleclick.net/pagead/html/r20260512/r20190131/zrt_lookup_fy2021.html" style="display: none;">
-<div style="all: initial;">
+    <head>
+        <title>phi-chart-render</title>
+        <meta name="description" content="A Phigros chart render based on Pixi.js" />
+        <meta name="author" content="MisaLiu" />
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width" />
+        <link rel="shortcut icon" href="./icons/favicon.ico" />
+        <link href="src/style/index.css" rel="stylesheet" />
+        <!--script src="./eruda.min.js"></script>
+        <script>eruda.init();</script-->
+        <script>
+            // 全屏相关。代码来自 lchzh3473
+            const fullscreen = {
+                // 切换全屏状态
+                toggle(elem, inDocument = false) {
+                    // if (!this.enabled) return false;
+                    if (this.element) {
+                        if (!inDocument) {
+                            if (document.exitFullscreen) return document.exitFullscreen();
+                            if (document.cancelFullScreen) return document.cancelFullScreen();
+                            if (document.webkitCancelFullScreen) return document.webkitCancelFullScreen();
+                            if (document.mozCancelFullScreen) return document.mozCancelFullScreen();
+                            if (document.msExitFullscreen) return document.msExitFullscreen();
+                        }
+                        
+                        if (this.element == elem) {
+                            elem.style.position = 'relative';
+                            elem.style.top = 'unset';
+                            elem.style.left = 'unset';
+                            elem.style.zIndex = 'unset';
+                            document.body.style.overflow = 'auto';
+                            
+                            document.inDocumentFullscreenElement = null;
+                            if (global.functions.resizeCanvas) global.functions.resizeCanvas();
+                            return true;
+                        }
+                        
+                        return false;
+                        
+                    } else {
+                        if (!inDocument) {
+                            if (!(elem instanceof HTMLElement)) elem = document.body;
+                            if (elem.requestFullscreen) return elem.requestFullscreen();
+                            if (elem.webkitRequestFullscreen) return elem.webkitRequestFullscreen();
+                            if (elem.mozRequestFullScreen) return elem.mozRequestFullScreen();
+                            if (elem.msRequestFullscreen) return elem.msRequestFullscreen();
+                        }
+                        
+                        if (elem != document.body) {
+                            elem.style.position = 'fixed';
+                            elem.style.top = '0';
+                            elem.style.left = '0';
+                            elem.style.zIndex = '5050';
+                            document.body.style.overflow = 'hidden';
+                            
+                            document.inDocumentFullscreenElement = elem;
+                            if (global.functions.resizeCanvas) global.functions.resizeCanvas();
+                            return true;
+                        }
+                        
+                        return false;
+                    }
+                },
+                
+                // 检查当前全屏的元素
+                check(elem) {
+                    if (!(elem instanceof HTMLElement)) elem = document.body;
+                    return this.element == elem;
+                },
+                
+                // 返回当前浏览器的全屏组件。
+                get element() {
+                    return document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement || document.inDocumentFullscreenElement;
+                },
+                
+                // 返回当前浏览器是否支持全屏 API。
+                get enabled() {
+                    return !!(document.fullscreenEnabled || document.webkitFullscreenEnabled || document.mozFullScreenEnabled || document.msFullscreenEnabled);
+                },
+                
+                // 返回当前的全屏模式。2 == 网页内全屏，1 == API 全屏，0 == 没有开启全屏
+                get type() {
+                    if (document.inDocumentFullscreenElement) {
+                        return 2;
+                    } else if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                }
+            };
+
+            function getSearchString(name)
+            {
+                let searchString = window.location.search.substring(1, window.location.search.length);
+                let searchStrings = searchString.split('&');
+
+                if (!name || name == '') return null;
+                if (searchStrings.length <= 0) return null;
+
+                for (const singleString of searchStrings)
+                {
+                    if (singleString.indexOf(name + '=') >= 0)
+                    {
+                        let stringValue = singleString.replace(name + '=', '');
+                        return decodeURIComponent(stringValue);
+                    }
+                }
+
+                return null;
+            }
+
+            if (getSearchString('debug') === 'true')
+            {
+                let xhr = new XMLHttpRequest();
+
+                xhr.onreadystatechange = () =>
+                {
+                    if (xhr.readyState === 4 && xhr.status === 200)
+                    {
+                        eval(xhr.responseText);
+                        window.vConsole = new window.VConsole();
+
+                        console.warn(
+                            'You\'re using debug mode, which will enable vConsole for mobile device debuging.\n' +
+                            'You SHOULDN\'T use debug mode in normal use, and don\'t run ANY code here from people that you don\'t know.'
+                        );
+                        console.warn(
+                            '你正在使用 debug 模式，该模式将启用 vConsole 以方便在移动设备上进行调试。\n' +
+                            '你【不应该】在正常使用中启用 debug 模式，并不要在这里运行【任何】来自你不认识的人的代码。'
+                        );
+                    }
+                }
+
+                xhr.open('GET', 'https://cdn.bootcdn.net/ajax/libs/vConsole/3.15.0/vconsole.min.js');
+                xhr.send();
+            }
+        </script>
+    </head>
+    <body>
+        <div class="file-select">
+            <div>
+                <b>For iOS users:</b><br>
+                Please use Quark Browser for better experience (not ad) .
+            </div>
+            <hr />
+            <div>
+                Due to some performance issue on FireFox Android, consider using <a href="https://github.com/kiwibrowser/src.next/releases" target="_blank">Kiwi Browser</a> or <a href="https://viayoo.com/" target="_blank">Via</a> or <a href="https://www.google.com/chrome/" target="_blank">Google Chrome</a>.
+            </div>
+            <hr />
+            <a href="https://t.bilibili.com/820800655803285656" target="_blank">致中国大陆用户的公告</a>
+            <hr />
+            <div class="loading" id="loading-status">Loading scripts...</div>
+            <hr />
+            <div class="tab">
+                <div class="bar">
+                    <div data-tab-id="file" class="active">File</div>
+                    <div data-tab-id="visual">Visual</div>
+                    <div data-tab-id="sound">Sound</div>
+                    <div data-tab-id="other">Other</div>
+                    <div data-tab-id="phizone">PhiZone</div>
+                </div>
+                <div class="content">
+                    <div id="tab-file">
+                        <label>Select chart file(s): <input type="file" id="file-chart-pack" multiple disabled></label><br>
+                        <div class="loading" id="file-read-progress">Please wait until assets loaded...</div>
+                        <hr />
+                        <label>Chart: <select id="file-chart"></select></label><br>
+                        <label>Music: <select id="file-music"></select></label><br>
+                        <label>BG: <select id="file-bg"></select></label>
+                    </div>
+                    <div id="tab-visual">
+                        <label>Custom skin pack: <input type="file" id="file-skin-pack" disabled /></label>&nbsp;<a href="./skin.example.zip" download="skin.example.zip">Download example skin pack</a><br>
+                        <div class="loading" id="loading-skin-pack">No skinpack selected.</div>
+                        <hr />
+                        <label><input type="checkbox" id="settings-show-bg" checked />Show BG</label><br>
+                        <label><input type="checkbox" id="settings-multi-note-hl" checked />Highlight same time notes</label><br>
+                        <label><input type="checkbox" id="settings-show-ap-status" checked />Show AP status</label><br>
+                        <label><input type="checkbox" id="settings-show-input-point" checked />Show input point</label><br>
+                        <label><input type="checkbox" id="settings-anti-alias" checked />Anti-alias</label><br>
+                        <label><input type="checkbox" id="settings-low-resolution" />Low resolution mode</label><br>
+                        <label><input type="checkbox" id="settings-prpr-extra" checked />Use prpr's extra.json (experimental)</label>
+                        <hr />
+                        <label>BG quality: <select id="settings-bg-quality">
+                            <option value="0">Low (480P)</option>
+                            <option value="1" default selected>Medium (720P)</option>
+                            <option value="2">High (1080P)</option>
+                            <option value="3">Original</option>
+                        </select></label>
+                        <hr />
+                        <label>Note scale: <input type="range" id="settings-note-scale" min="0" max="4000" value="2000"></label><br>
+                        <label>Background dim: <input type="range" id="settings-bg-dim" min="0" max="1" step="0.01" value="0.5"></label><br>
+                        <label>BG blur: <input type="range" id="settings-bg-blur" min="0" max="100" value="50" /></label>
+                    </div>
+                    <div id="tab-sound">
+                        <label>Chart offset: <input type="number" id="settings-audio-offset" placeholder="0" style="width:4em" />ms</label><br>
+                        <div style="margin-left:20px">(recommended 100ms for Chrome/Chrome based browsers)</div>
+                        <button id="settings-test-input-delay">Tap on this button to test input delay...</button><br>
+                        <label><input type="checkbox" id="settings-use-browser-latency" />Use browser's output latency (experimental)</label><br>
+                        <label>Speed: <input type="range" id="settings-audio-speed" min="0.25" max="1.75" step="0.25" value="1"></label><br>
+                        <hr />
+                        <label><input type="checkbox" id="settings-hitsound" checked />Hitsound</label><br>
+                        <label>Hitsound volume: <input type="range" id="settings-hitsound-volume" min="0" max="1" step="0.01" value="1"></label><br>
+                    </div>
+                    <div id="tab-other">
+                        <label><input type="checkbox" id="settings-challenge-mode" />Challenge Mode</label><br>
+                        <label><input type="checkbox" id="settings-plyndb" />Play like you never did before</label><br>
+                        <label><input type="checkbox" id="settings-autoplay" />AutoPlay</label><br>
+                        <label><input type="checkbox" id="settings-debug" />Debug</label><br>
+                    </div>
+                    <div id="tab-phizone">
+                        <label>Paste chart link/ID from <a href="https://www.phi.zone/" target="_href">PhiZone</a> here: <input id="phizone-chart-link" /></label>
+                        <button id="phizone-download-chart">Download</button>
+                        <hr />
+                        <div class="loading" id="phizone-download-progress">No download task</div>
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <button id="start" disabled>Start</button>
+            <hr />
+            Current version: <%= GIT_VERSION %><br>
+            GitHub homepage: <a href="https://github.com/MisaLiu/phi-chart-render" target="_blank">https://github.com/MisaLiu/phi-chart-render</a><br>
+            Report bugs <a href="https://github.com/MisaLiu/phi-chart-render/issues/new/choose" target="_blank">Here</a>
+            <hr />
+            Consider <a href="https://patreon.com/HIMlaoS_Misa" target="_blank">support me on Patreon</a> if you like!<br />
+            喜欢的话可以到 <a href="https://afdian.net/a/MisaLiu" target="_blank">爱发电</a> 支持一下！
+            <hr />
+            We uses <a href="https://sentry.io" target="_blank">Sentry.io</a> and <a href="https://analytics.google.com/" target="_blank">Google Analytics</a> to tracking errors and analyze user usage data.
+
+            <button onclick="fullscreen.toggle(document.body, false)" class="fullscreen" id="fullscreen">Fullscreen</button>
+        </div>
+
+        <div class="debug-value"></div>
+        
+        <div class="play-result">
+            <div class="bg-shadow-cover top"></div>
+            <div class="bg-shadow-cover"></div>
+
+            <div class="song-info">
+                <div class="title">Song name</div>
+                <div class="subtitle artist">Artist</div>
+                <div class="subtitle diff">SP Lv.?</div>
+            </div>
+
+            <div class="judge-icon">S</div>
+            <div class="extra-info">FULL COMBO</div>
+            
+            <div class="info-bar score">
+                <div class="score">1000000</div>
+                <div class="acc">Accuracy 100.00%</div>
+            </div>
+
+            <div class="info-bar acc-bar">
+                <div class="judge-histogram">
+                    <div class="center"></div>
+                </div>
+            </div>
+
+            <div class="info-bar detail">
+                <div class="detail">
+                    <div class="detail-single">
+                        <div class="type">Perfect</div>
+                        <div class="value perfect">100</div>
+                    </div>
+                    <div class="detail-single">
+                        <div class="type">Good</div>
+                        <div class="value good">0</div>
+                    </div>
+                    <div class="detail-single">
+                        <div class="type">Bad</div>
+                        <div class="value bad">0</div>
+                    </div>
+                    <div class="detail-single">
+                        <div class="type">Miss</div>
+                        <div class="value miss">0</div>
+                    </div>
+                </div>
+                <div class="max-combo">Max Combo 100</div>
+            </div>
+
+            <div class="actions">
+                <button onclick="history.go(0)">Refresh</button>
+                <button class="big highlight" onclick="restartGame()">Restart</button>
+                <button class="big highlight" onclick="exitGame()">Exit</button>
+            </div>
+        </div>
+
+        <div class="game-paused">
+            <div class="title">Game paused</div>
+            <div class="action">
+                <button onclick="fullscreen.toggle(document.body, false)">Fullscreen</button>
+                <button onclick="exitGame()">Exit</button>
+                <button onclick="restartGame()">Restart</button>
+                <button onclick="pauseGame()">Continue</button>
+            </div>
+        </div>
+
+        <div class="error-window">
+            <div>An error has just occurred, if you're sure this is not caused by you, please <a href="https://github.com/MisaLiu/phi-chart-render/issues/new/choose" target="_blank">report it on GitHub</a>. <!--a href="#" onclick="eruda.show();return false;">Show Eruda</a--><button class="close">Close</button></div>
+            <pre><code class="content">Test Text Not A Real Error</code></pre>
+            <div>The infomation about this error will upload to <a href="https://sentry.io" target="_blank">Sentry.io</a> for analyze and debug.</div>
+        </div>
+
+        <script type="module" src="/src/index.js"></script>
+    </body>
 </html>
